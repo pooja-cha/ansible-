@@ -1,0 +1,13 @@
+---
+- hosts: linux
+  tasks:
+  - name: validate whthr web service is running 
+    wait_for: 
+      host: localhost
+      port: 80
+      delay: 10
+      timeout: 30
+      state: started
+      msg: "webserver is running and listening"
+    ignore_errors: true
+

@@ -1,0 +1,46 @@
+---
+- hosts: localhost
+  tasks:
+  - name: create a resource group 
+    azure.azcollection.azure_rm_resourcegroup:
+      name: User7
+      location: East US
+    register: rg
+  - name: create Virtual nw
+    azure_rm_virtualnetwork:
+      name: User7vnet
+      resource_group: "{{ rg.name }}"
+      address_prefixes: ["10.0.0.0/16"]
+    register: vnet
+  - name: create subnet
+    azure_rm_subnet:
+      name: User7subnet
+      resource_group: "{{ rg.name }}"
+      virtual_network_name: "{{ vnet.name }}"
+      address_prefixes: "10.0.0.0/24"
+  - name: create ip and address
+    azure_rm_publicipaddress:
+      name: trainerpublicip
+      resource_group: "{{ rg.name }}"
+      allocation_method: Dynamic
+  - name: create a nw sg
+    azure_rm_securitygroup:
+      name: User7sg
+      resource_group: "{{ rg.name }}"
+      rules: 
+        - name: SSH_user7
+          access: allow
+          direction: Inbound
+          priority: 100
+          protocol: tcp
+          source_port_range: "*"
+          source_address_prefix: "*"
+          destination_port_range: 22
+          destination_port_prefix: "*"
+  - name: Create VM
+    azure_rm_virtualmachine:
+      name: USer7vm
+      resource_group: "{{ rg.name }}"
+      location: East US
+      size: 
+     

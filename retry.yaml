@@ -1,0 +1,13 @@
+---
+- hosts: linux
+  tasks: 
+  - name: wait for the file to be available
+    file:
+      path: /tmp/lockfile
+      state: file
+    register: fileexists
+    until: fileexits is not failed
+    retries: 5
+    delay: 10
+    ignore_errors: true
+
